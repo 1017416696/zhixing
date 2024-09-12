@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F66038532C928931008F17B7 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038522C928931008F17B7 /* MapView.swift */; };
+		F66038552C928B40008F17B7 /* AddNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038542C928B40008F17B7 /* AddNoteView.swift */; };
+		F66038582C928B5B008F17B7 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038562C928B5B008F17B7 /* Note.swift */; };
+		F66038592C928B5B008F17B7 /* NotesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038572C928B5B008F17B7 /* NotesListView.swift */; };
+		F6BF73362C8D73F80011D5D5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BF73352C8D73F80011D5D5 /* AppDelegate.swift */; };
+		F6BF733E2C8DE9540011D5D5 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BF733D2C8DE9540011D5D5 /* CameraView.swift */; };
 		F6F9058C2C8C49E100815465 /* zhixingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F9058B2C8C49E100815465 /* zhixingApp.swift */; };
 		F6F9058E2C8C49E100815465 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F9058D2C8C49E100815465 /* ContentView.swift */; };
 		F6F905902C8C49E200815465 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F6F9058F2C8C49E200815465 /* Assets.xcassets */; };
@@ -14,6 +20,8 @@
 		F6F9059D2C8C49E200815465 /* zhixingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F9059C2C8C49E200815465 /* zhixingTests.swift */; };
 		F6F905A72C8C49E200815465 /* zhixingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F905A62C8C49E200815465 /* zhixingUITests.swift */; };
 		F6F905A92C8C49E200815465 /* zhixingUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F905A82C8C49E200815465 /* zhixingUITestsLaunchTests.swift */; };
+		F6F905B62C8C4BF200815465 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F905B52C8C4BF200815465 /* LocationManager.swift */; };
+		F6F905B82C8C4CB100815465 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F905B72C8C4CB100815465 /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +42,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F66038522C928931008F17B7 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		F66038542C928B40008F17B7 /* AddNoteView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddNoteView.swift; sourceTree = "<group>"; };
+		F66038562C928B5B008F17B7 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		F66038572C928B5B008F17B7 /* NotesListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesListView.swift; sourceTree = "<group>"; };
+		F6BF73352C8D73F80011D5D5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F6BF733D2C8DE9540011D5D5 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		F6F905882C8C49E100815465 /* zhixing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = zhixing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6F9058B2C8C49E100815465 /* zhixingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = zhixingApp.swift; sourceTree = "<group>"; };
 		F6F9058D2C8C49E100815465 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,6 +58,9 @@
 		F6F905A22C8C49E200815465 /* zhixingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = zhixingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6F905A62C8C49E200815465 /* zhixingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = zhixingUITests.swift; sourceTree = "<group>"; };
 		F6F905A82C8C49E200815465 /* zhixingUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = zhixingUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F6F905B52C8C4BF200815465 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		F6F905B72C8C4CB100815465 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		F6F905B92C8C4D9D00815465 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +91,7 @@
 		F6F9057F2C8C49E000815465 = {
 			isa = PBXGroup;
 			children = (
+				F6BF73352C8D73F80011D5D5 /* AppDelegate.swift */,
 				F6F9058A2C8C49E100815465 /* zhixing */,
 				F6F9059B2C8C49E200815465 /* zhixingTests */,
 				F6F905A52C8C49E200815465 /* zhixingUITests */,
@@ -94,10 +112,18 @@
 		F6F9058A2C8C49E100815465 /* zhixing */ = {
 			isa = PBXGroup;
 			children = (
+				F66038562C928B5B008F17B7 /* Note.swift */,
+				F66038572C928B5B008F17B7 /* NotesListView.swift */,
+				F66038542C928B40008F17B7 /* AddNoteView.swift */,
+				F6F905B92C8C4D9D00815465 /* Info.plist */,
 				F6F9058B2C8C49E100815465 /* zhixingApp.swift */,
 				F6F9058D2C8C49E100815465 /* ContentView.swift */,
 				F6F9058F2C8C49E200815465 /* Assets.xcassets */,
 				F6F905912C8C49E200815465 /* Preview Content */,
+				F6F905B52C8C4BF200815465 /* LocationManager.swift */,
+				F6F905B72C8C4CB100815465 /* ImagePicker.swift */,
+				F6BF733D2C8DE9540011D5D5 /* CameraView.swift */,
+				F66038522C928931008F17B7 /* MapView.swift */,
 			);
 			path = zhixing;
 			sourceTree = "<group>";
@@ -257,8 +283,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F66038532C928931008F17B7 /* MapView.swift in Sources */,
 				F6F9058E2C8C49E100815465 /* ContentView.swift in Sources */,
+				F6F905B82C8C4CB100815465 /* ImagePicker.swift in Sources */,
 				F6F9058C2C8C49E100815465 /* zhixingApp.swift in Sources */,
+				F6BF733E2C8DE9540011D5D5 /* CameraView.swift in Sources */,
+				F66038582C928B5B008F17B7 /* Note.swift in Sources */,
+				F6BF73362C8D73F80011D5D5 /* AppDelegate.swift in Sources */,
+				F66038552C928B40008F17B7 /* AddNoteView.swift in Sources */,
+				F66038592C928B5B008F17B7 /* NotesListView.swift in Sources */,
+				F6F905B62C8C4BF200815465 /* LocationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -425,11 +459,17 @@
 				DEVELOPMENT_TEAM = BA8XCB3SBT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = zhixing/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "我们需要访问相机来拍摄照片并添加水印";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "我们需要在后台访问您的位置以提供更准确的位置水印。\"\n我们需要在后台访问您的位置以提供更准确的位置水印。\"\n我们需要在后台访问您的位置以提供更准确的位置";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "我们需要访问您的位置以在照片上添加位置水印";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要访问相片才能存储照片";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相片才能存储照片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -454,11 +494,17 @@
 				DEVELOPMENT_TEAM = BA8XCB3SBT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = zhixing/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "我们需要访问相机来拍摄照片并添加水印";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "我们需要在后台访问您的位置以提供更准确的位置水印。\"\n我们需要在后台访问您的位置以提供更准确的位置水印。\"\n我们需要在后台访问您的位置以提供更准确的位置";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "我们需要访问您的位置以在照片上添加位置水印";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要访问相片才能存储照片";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相片才能存储照片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
