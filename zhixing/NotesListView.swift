@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 struct NotesListView: View {
-    @State private var notes: [Note] = []
+    @StateObject private var noteStore = NoteStore()
     @State private var showingAddNote = false
     @State private var selectedView = 0
     
@@ -45,7 +45,7 @@ struct NotesListView: View {
                 .padding()
                 
                 if selectedView == 0 {
-                    if notes.isEmpty {
+                    if noteStore.notes.isEmpty {
                         VStack(spacing: 20) { // 增加了spacing参数
                             Image(systemName: "note.text")
                                 .font(.system(size: 50))
@@ -86,17 +86,17 @@ struct NotesListView: View {
                         }
                     }
                 } else {
-                    NoteMapView(notes: notes)
+                     NoteMapView(notes: noteStore.notes)
                 }
             }
         }
         .sheet(isPresented: $showingAddNote) {
-            AddNoteView(notes: $notes)
+            AddNoteView(noteStore: noteStore)
         }
     }
     
     private func groupedNotes() -> [(Date, [Note])] {
-        let groupedDict = Dictionary(grouping: notes) { note in
+        let groupedDict = Dictionary(grouping: noteStore.notes) { note in
             Calendar.current.startOfDay(for: note.date)
         }
         return groupedDict.map { date, notes in

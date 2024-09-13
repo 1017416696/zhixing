@@ -8,19 +8,39 @@
 import SwiftUI
 import CoreLocation
 
-struct Note: Identifiable {
-    let id = UUID()
+struct Note: Identifiable, Codable {
+    let id: UUID
     var content: String
-    var image: UIImage
+    var imageData: Data
     var date: Date
     var location: CLLocationCoordinate2D?
     let locationName: String
 
     init(content: String, image: UIImage, date: Date, location: CLLocationCoordinate2D?, locationName: String = "") {
+        self.id = UUID()
         self.content = content
-        self.image = image
+        self.imageData = image.jpegData(compressionQuality: 0.8) ?? Data()
         self.date = date
         self.location = location
         self.locationName = locationName
+    }
+
+    var image: UIImage {
+        UIImage(data: imageData) ?? UIImage()
+    }
+}
+
+extension CLLocationCoordinate2D: Codable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(latitude)
+        try container.encode(longitude)
+    }
+    
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let latitude = try container.decode(Double.self)
+        let longitude = try container.decode(Double.self)
+        self.init(latitude: latitude, longitude: longitude)
     }
 }

@@ -10,7 +10,7 @@ import CoreLocation
 import Photos
 
 struct AddNoteView: View {
-    @Binding var notes: [Note]
+    @ObservedObject var noteStore: NoteStore
     @State private var content = ""
     @State private var image: UIImage?
     @State private var showingImagePicker = false
@@ -141,7 +141,7 @@ struct AddNoteView: View {
     
     private func saveNote() {
         let newNote = Note(content: content, image: image!, date: Date(), location: location, locationName: locationName)
-        notes.append(newNote)
+        noteStore.addNote(newNote)
         presentationMode.wrappedValue.dismiss()
     }
     
