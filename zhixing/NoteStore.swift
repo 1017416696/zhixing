@@ -19,6 +19,13 @@ class NoteStore: ObservableObject {
         saveNotes()
     }
     
+    func updateNote(_ updatedNote: Note) {
+        if let index = notes.firstIndex(where: { $0.id == updatedNote.id }) {
+            notes[index] = updatedNote
+            saveNotes()
+        }
+    }
+    
     private func saveNotes() {
         if let encodedData = try? JSONEncoder().encode(notes) {
             UserDefaults.standard.set(encodedData, forKey: "notes")

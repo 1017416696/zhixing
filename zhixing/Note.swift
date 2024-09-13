@@ -14,7 +14,7 @@ struct Note: Identifiable, Codable {
     var imageData: Data
     var date: Date
     var location: CLLocationCoordinate2D?
-    let locationName: String
+    var locationName: String  // 改为 var
 
     init(content: String, image: UIImage, date: Date, location: CLLocationCoordinate2D?, locationName: String = "") {
         self.id = UUID()
@@ -25,8 +25,15 @@ struct Note: Identifiable, Codable {
         self.locationName = locationName
     }
 
-    var image: UIImage {
-        UIImage(data: imageData) ?? UIImage()
+    var image: UIImage? {  // 改为可选类型
+        get {
+            UIImage(data: imageData)
+        }
+        set {
+            if let newImage = newValue {
+                imageData = newImage.jpegData(compressionQuality: 0.8) ?? Data()
+            }
+        }
     }
 }
 

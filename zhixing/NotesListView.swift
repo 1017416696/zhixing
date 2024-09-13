@@ -63,9 +63,9 @@ struct NotesListView: View {
                             ForEach(groupedNotes(), id: \.0) { date, dailyNotes in
                                 Section(header: Text(formattedDate(date))) {
                                     ForEach(dailyNotes) { note in
-                                        NavigationLink(destination: NoteDetailView(note: note)) {
+                                        NavigationLink(destination: NoteDetailView(note: note).environmentObject(noteStore)) {
                                             HStack {
-                                                Image(uiImage: note.image)
+                                                Image(uiImage: note.image ?? UIImage())
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fill)
                                                     .frame(width: 60, height: 60)
@@ -119,26 +119,40 @@ struct NotesListView: View {
 }
 
 struct NoteDetailView: View {
-    let note: Note
+    @EnvironmentObject var noteStore: NoteStore
+    @State private var editedNote: Note
+    @State private var isEditing = false
     @State private var isImageFullscreen = false
+    @State private var showingImagePicker = false
+    @State private var showingLocationInput = false
+    @State private var tempImage: UIImage?  // 添加这行
+
+    init(note: Note) {
+        _editedNote = State(initialValue: note)
+        _tempImage = State(initialValue: note.image)  // 添加这行
+    }
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 // 图片部分
                 ZStack(alignment: .bottomTrailing) {
-                    Image(uiImage: note.image)
+                    Image(uiImage: tempImage ?? UIImage())  // 使用 tempImage
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(height: 300)
                         .clipped()
                         .cornerRadius(12)
                         .onTapGesture {
-                            isImageFullscreen = true
+                            if isEditing {
+                                showingImagePicker = true
+                            } else {
+                                isImageFullscreen = true
+                            }
                         }
                     
                     // 日期覆盖在图片上
-                    Text(formattedDate(note.date))
+                    Text(formattedDate(editedNote.date))
                         .font(.caption)
                         .padding(8)
                         .background(Color.black.opacity(0.6))
@@ -148,35 +162,49 @@ struct NoteDetailView: View {
                 }
                 
                 // 位置信息部分
-                if let location = note.location {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("图片位置", systemImage: "mappin.and.ellipse")
-                            .font(.headline)
-                        
-                        if !note.locationName.isEmpty {
-                            Text(note.locationName)
-                                .font(.subheadline)
-                        }
-                        
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("图片位置", systemImage: "mappin.and.ellipse")
+                        .font(.headline)
+                    
+                    if !editedNote.locationName.isEmpty {
+                        Text(editedNote.locationName)
+                            .font(.subheadline)
+                    }
+                    
+                    if let location = editedNote.location {
                         Text("经度: \(location.longitude, specifier: "%.6f")")
                             .font(.caption)
                         Text("纬度: \(location.latitude, specifier: "%.6f")")
                             .font(.caption)
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
+                    
+                    if isEditing {
+                        Button("更改位置") {
+                            showingLocationInput = true
+                        }
+                    }
                 }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
                 
                 // 内容部分
                 VStack(alignment: .leading, spacing: 12) {
                     Text("笔记内容")
                         .font(.headline)
                     
-                    Text(note.content)
-                        .font(.body)
-                        .lineSpacing(4)
+                    if isEditing {
+                        TextEditor(text: $editedNote.content)
+                            .frame(height: 200)
+                            .padding(4)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
+                    } else {
+                        Text(editedNote.content)
+                            .font(.body)
+                            .lineSpacing(4)
+                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -187,8 +215,28 @@ struct NoteDetailView: View {
         }
         .navigationTitle("笔记详情")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarItems(trailing: editButton)
         .fullScreenCover(isPresented: $isImageFullscreen) {
-            FullscreenImageView(image: note.image, isPresented: $isImageFullscreen)
+            FullscreenImageView(image: tempImage ?? UIImage(), isPresented: $isImageFullscreen)
+        }
+        .sheet(isPresented: $showingImagePicker) {
+            CustomImagePicker(image: $tempImage, location: $editedNote.location, locationName: $editedNote.locationName)
+        }
+        .sheet(isPresented: $showingLocationInput) {
+            LocationInputView(locationName: $editedNote.locationName, location: $editedNote.location)
+        }
+    }
+    
+    private var editButton: some View {
+        Button(action: {
+            if isEditing {
+                // 保存更改
+                editedNote.image = tempImage  // 更新 editedNote 的图片
+                noteStore.updateNote(editedNote)
+            }
+            isEditing.toggle()
+        }) {
+            Text(isEditing ? "保存" : "编辑")
         }
     }
     
