@@ -235,7 +235,6 @@ struct MapViewRepresentable: UIViewRepresentable {
                 // 保留现有的用户位置标识代码
                 // ... 现有代码 ...
             } else {
-                // 为笔记创建新的标识视图
                 let identifier = "noteAnnotation"
                 var view: MKAnnotationView
                 
@@ -245,27 +244,49 @@ struct MapViewRepresentable: UIViewRepresentable {
                     view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 }
                 
-                // 查找对应的笔记
                 if let annotationCoordinate = annotation.coordinate as? CLLocationCoordinate2D,
                    let matchingNote = parent.annotations.first(where: { $0.coordinate == annotationCoordinate })?.note {
                     
-                    // 使用笔记的缩略图
                     if let thumbnailImage = matchingNote.image {
                         let size: CGFloat = 40
-                        UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, 0)
-                        thumbnailImage.draw(in: CGRect(x: 0, y: 0, width: size, height: size))
+                        let imageSize = thumbnailImage.size
+                        let aspectRatio = imageSize.width / imageSize.height
+                        
+                        var newSize: CGSize
+                        if aspectRatio > 1 {
+                            newSize = CGSize(width: size, height: size / aspectRatio)
+                        } else {
+                            newSize = CGSize(width: size * aspectRatio, height: size)
+                        }
+                        
+                        UIGraphicsBeginImageContextWithOptions(newSize, false, 0)
+                        thumbnailImage.draw(in: CGRect(origin: .zero, size: newSize))
                         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
                         UIGraphicsEndImageContext()
                         
-                        view.image = resizedImage
-                        view.frame = CGRect(x: 0, y: 0, width: size, height: size)
-                        view.layer.cornerRadius = size / 2
-                        view.layer.masksToBounds = true
-                        view.layer.borderWidth = 2
-                        view.layer.borderColor = UIColor.white.cgColor
+                        // 创建一个新的容器视图
+                        let containerView = UIView(frame: CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height + 10))
+                        
+                        // 添加图片视图
+                        let imageView = UIImageView(image: resizedImage)
+                        imageView.frame = CGRect(origin: .zero, size: newSize)
+                        imageView.layer.cornerRadius = 4
+                        imageView.layer.masksToBounds = true
+                        imageView.layer.borderWidth = 2
+                        imageView.layer.borderColor = UIColor.white.cgColor
+                        containerView.addSubview(imageView)
+                        
+                        // 添加三角形
+                        let triangleView = TriangleView(frame: CGRect(x: (newSize.width - 10) / 2, y: newSize.height, width: 10, height: 10))
+                        triangleView.backgroundColor = .clear
+                        containerView.addSubview(triangleView)
+                        
+                        view.addSubview(containerView)
+                        view.frame = containerView.frame
                     }
                 }
                 
+                view.backgroundColor = .clear
                 return view
             }
             return nil
@@ -328,6 +349,22 @@ struct CompassView: View {
                 .foregroundColor(.red)
                 .rotationEffect(.degrees(-rotation))
         }
+    }
+}
+
+// 添加一个新的 TriangleView 类
+class TriangleView: UIView {
+    override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        
+        context.beginPath()
+        context.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        context.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        context.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        context.closePath()
+        
+        UIColor.white.setFill()
+        context.fillPath()
     }
 }
 
