@@ -74,6 +74,7 @@ struct NotesListView: View {
 
 struct NoteDetailView: View {
     let note: Note
+    @State private var isImageFullscreen = false
     
     var body: some View {
         ScrollView {
@@ -83,16 +84,61 @@ struct NoteDetailView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(maxHeight: 300)
                     .cornerRadius(12)
+                    .onTapGesture {
+                        isImageFullscreen = true
+                    }
                 
                 Text(note.content)
                     .font(.body)
                 
-                Text(note.date, style: .date)
+                Text(formattedDate(note.date))
                     .font(.caption)
                     .foregroundColor(.gray)
             }
             .padding()
         }
         .navigationTitle("笔记详情")
+        .fullScreenCover(isPresented: $isImageFullscreen) {
+            FullscreenImageView(image: note.image, isPresented: $isImageFullscreen)
+        }
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateFormat = "yyyy年M月d日EEEE"
+        return formatter.string(from: date)
+    }
+}
+
+struct FullscreenImageView: View {
+    let image: UIImage
+    @Binding var isPresented: Bool
+    @State private var offset = CGSize.zero
+    
+    var body: some View {
+        Image(uiImage: image)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black)
+            .edgesIgnoringSafeArea(.all)
+            .offset(y: offset.height)
+            .gesture(
+                DragGesture()
+                    .onChanged { gesture in
+                        offset = gesture.translation
+                    }
+                    .onEnded { _ in
+                        if abs(offset.height) > 100 {
+                            isPresented = false
+                        } else {
+                            offset = .zero
+                        }
+                    }
+            )
+            .onTapGesture {
+                isPresented = false
+            }
     }
 }
