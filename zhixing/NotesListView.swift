@@ -81,6 +81,11 @@ struct NotesListView: View {
                                             }
                                         }
                                     }
+                                    .onDelete { indices in
+                                        for index in indices {
+                                            noteStore.deleteNote(dailyNotes[index])
+                                        }
+                                    }
                                 }
                             }
                         }

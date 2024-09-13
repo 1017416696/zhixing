@@ -26,6 +26,11 @@ class NoteStore: ObservableObject {
         }
     }
     
+    func deleteNote(_ note: Note) {
+        notes.removeAll { $0.id == note.id }
+        saveNotes()
+    }
+    
     private func saveNotes() {
         if let encodedData = try? JSONEncoder().encode(notes) {
             UserDefaults.standard.set(encodedData, forKey: "notes")
