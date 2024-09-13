@@ -45,18 +45,42 @@ struct NotesListView: View {
                 .padding()
                 
                 if selectedView == 0 {
-                    List(notes) { note in
-                        NavigationLink(destination: NoteDetailView(note: note)) {
-                            HStack {
-                                Image(uiImage: note.image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 60, height: 60)
-                                    .cornerRadius(8)
-                                VStack(alignment: .leading) {
-                                    Text(note.content.prefix(50) + "...")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
+                    if notes.isEmpty {
+                        VStack(spacing: 20) { // 增加了spacing参数
+                            Image(systemName: "note.text")
+                                .font(.system(size: 50))
+                                .foregroundColor(.gray)
+                            Text("还没有有笔记哦")
+                                .font(.title2)
+                                .foregroundColor(.gray)
+                            Text("点击右上角的加号开始创建吧！")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        List {
+                            ForEach(groupedNotes(), id: \.0) { date, dailyNotes in
+                                Section(header: Text(formattedDate(date))) {
+                                    ForEach(dailyNotes) { note in
+                                        NavigationLink(destination: NoteDetailView(note: note)) {
+                                            HStack {
+                                                Image(uiImage: note.image)
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 60, height: 60)
+                                                    .cornerRadius(8)
+                                                VStack(alignment: .leading, spacing: 4) {
+                                                    Text(note.content.prefix(50) + "...")
+                                                        .font(.subheadline)
+                                                        .foregroundColor(.primary)
+                                                    Text(formattedTime(note.date))
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -69,6 +93,28 @@ struct NotesListView: View {
         .sheet(isPresented: $showingAddNote) {
             AddNoteView(notes: $notes)
         }
+    }
+    
+    private func groupedNotes() -> [(Date, [Note])] {
+        let groupedDict = Dictionary(grouping: notes) { note in
+            Calendar.current.startOfDay(for: note.date)
+        }
+        return groupedDict.map { date, notes in
+            (date, notes.sorted { $0.date > $1.date })
+        }.sorted { $0.0 > $1.0 }
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy年M月d日EEEE"
+        formatter.locale = Locale(identifier: "zh_CN")
+        return formatter.string(from: date)
+    }
+    
+    private func formattedTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
     }
 }
 
