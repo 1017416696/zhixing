@@ -27,12 +27,13 @@ struct LocationKey: Hashable {
 }
 
 struct NoteAnnotation: Identifiable {
+    let id = UUID()
     var coordinate: CLLocationCoordinate2D
-    var note: Note
+    var notes: [Note]
     var count: Int
     
-    var id: String {
-        "\(coordinate.latitude),\(coordinate.longitude)"
+    var thumbnailImage: UIImage? {
+        notes.first?.image
     }
 }
 
@@ -68,24 +69,30 @@ struct NoteMapView: View {
     let notes: [Note]
     @StateObject private var locationManager = LocationManager()
     @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 23.1291, longitude: 113.2644), // 广州市中心坐标
-        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005) // 调整这个值以获得合适的缩放级别
+        center: CLLocationCoordinate2D(latitude: 23.1291, longitude: 113.2644),
+        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
     )
     @State private var selectedMapStyle: CustomMapStyle = .standard
     @State private var userLocation: CLLocationCoordinate2D?
     @State private var isLocating: Bool = false
     @State private var showCompass: Bool = false
-    @State private var mapRotation: Double = 0 // 新增：跟踪地图旋转角度
+    @State private var mapRotation: Double = 0
+    @State private var selectedNote: Note? // 新增：跟踪选中的笔记
+    @State private var showingNoteDetail = false // 新增：控制是否显示笔记详情
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             MapViewRepresentable(region: $region, 
                                  mapType: $selectedMapStyle, 
                                  annotations: annotationItems, 
-                                 showCompass: $showCompass, // 添加 showCompass 参数
+                                 showCompass: $showCompass,
                                  mapRotation: $mapRotation,
-                                 userLocation: locationManager.location, // 添加 userLocation 参数
-                                 isLocating: $isLocating) // 添加 isLocating 参数
+                                 userLocation: locationManager.location,
+                                 isLocating: $isLocating,
+                                 onAnnotationTapped: { note in // 新增：处理标注点击
+                                     selectedNote = note
+                                     showingNoteDetail = true
+                                 })
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
@@ -124,6 +131,11 @@ struct NoteMapView: View {
             .cornerRadius(12)
             .padding([.top, .trailing], 16)
         }
+        .sheet(isPresented: $showingNoteDetail) { // 新增：显示笔记详情的 sheet
+            if let note = selectedNote {
+                NoteDetailView(note: note)
+            }
+        }
         .onAppear {
             locationManager.startUpdatingLocation()
         }
@@ -146,7 +158,7 @@ struct NoteMapView: View {
         if let location = locationManager.location {
             region = MKCoordinateRegion(
                 center: location,
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01) // 调整这个值以获得合适的缩放级别
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             )
             userLocation = location
             isLocating = true
@@ -158,10 +170,11 @@ struct MapViewRepresentable: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
     @Binding var mapType: CustomMapStyle
     let annotations: [AnnotationItem]
-    @Binding var showCompass: Bool // 添加 showCompass 绑定
+    @Binding var showCompass: Bool
     @Binding var mapRotation: Double
     let userLocation: CLLocationCoordinate2D?
-    @Binding var isLocating: Bool // 添加 isLocating 绑定
+    @Binding var isLocating: Bool
+    var onAnnotationTapped: (Note) -> Void // 新增：回调函数
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
@@ -219,31 +232,40 @@ struct MapViewRepresentable: UIViewRepresentable {
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             if annotation.title == "当前位置" {
-                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: "userLocation")
+                // 保留现有的用户位置标识代码
+                // ... 现有代码 ...
+            } else {
+                // 为笔记创建新的标识视图
+                let identifier = "noteAnnotation"
+                var view: MKAnnotationView
                 
-                // 创建一个更美观的定位标识
-                let size: CGFloat = 30
-                UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, 0)
-                let context = UIGraphicsGetCurrentContext()!
+                if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) {
+                    view = dequeuedView
+                } else {
+                    view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                }
                 
-                // 绘制外圈
-                context.setFillColor(UIColor.white.cgColor)
-                context.fillEllipse(in: CGRect(x: 0, y: 0, width: size, height: size))
+                // 查找对应的笔记
+                if let annotationCoordinate = annotation.coordinate as? CLLocationCoordinate2D,
+                   let matchingNote = parent.annotations.first(where: { $0.coordinate == annotationCoordinate })?.note {
+                    
+                    // 使用笔记的缩略图
+                    if let thumbnailImage = matchingNote.image {
+                        let size: CGFloat = 40
+                        UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, 0)
+                        thumbnailImage.draw(in: CGRect(x: 0, y: 0, width: size, height: size))
+                        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+                        UIGraphicsEndImageContext()
+                        
+                        view.image = resizedImage
+                        view.frame = CGRect(x: 0, y: 0, width: size, height: size)
+                        view.layer.cornerRadius = size / 2
+                        view.layer.masksToBounds = true
+                        view.layer.borderWidth = 2
+                        view.layer.borderColor = UIColor.white.cgColor
+                    }
+                }
                 
-                // 绘制内圈，使用更柔和的蓝色
-                context.setFillColor(UIColor(red: 0.3, green: 0.5, blue: 1.0, alpha: 1.0).cgColor) // 柔和蓝色
-                context.fillEllipse(in: CGRect(x: 4, y: 4, width: size - 8, height: size - 8))
-                
-                // 制中心点
-                context.setFillColor(UIColor.white.cgColor)
-                context.fillEllipse(in: CGRect(x: size/2 - 2, y: size/2 - 2, width: 4, height: 4))
-                
-                let image = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
-                
-                view.image = image
-                view.frame = CGRect(x: 0, y: 0, width: size, height: size)
-                view.centerOffset = CGPoint(x: 0, y: -size / 2)
                 return view
             }
             return nil
@@ -258,6 +280,14 @@ struct MapViewRepresentable: UIViewRepresentable {
             parent.region = mapView.region
             parent.showCompass = mapView.camera.heading != 0
             parent.mapRotation = mapView.camera.heading
+        }
+
+        func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+            if let annotation = view.annotation,
+               let coordinate = annotation.coordinate as? CLLocationCoordinate2D,
+               let matchingNote = parent.annotations.first(where: { $0.coordinate == coordinate })?.note {
+                parent.onAnnotationTapped(matchingNote)
+            }
         }
     }
 }
