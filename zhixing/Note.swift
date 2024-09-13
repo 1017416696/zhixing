@@ -14,4 +14,13 @@ struct Note: Identifiable {
     var image: UIImage
     var date: Date
     var location: CLLocationCoordinate2D?
+    let locationName: String
+
+    init(content: String, image: UIImage, date: Date, location: CLLocationCoordinate2D?, locationName: String = "") {
+        self.content = content
+        self.image = image
+        self.date = date
+        self.location = location
+        self.locationName = locationName
+    }
 }

@@ -140,7 +140,7 @@ struct AddNoteView: View {
     }
     
     private func saveNote() {
-        let newNote = Note(content: content, image: image!, date: Date(), location: location)
+        let newNote = Note(content: content, image: image!, date: Date(), location: location, locationName: locationName)
         notes.append(newNote)
         presentationMode.wrappedValue.dismiss()
     }

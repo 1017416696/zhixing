@@ -79,25 +79,68 @@ struct NoteDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Image(uiImage: note.image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxHeight: 300)
-                    .cornerRadius(12)
-                    .onTapGesture {
-                        isImageFullscreen = true
+                // 图片部分
+                ZStack(alignment: .bottomTrailing) {
+                    Image(uiImage: note.image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 300)
+                        .clipped()
+                        .cornerRadius(12)
+                        .onTapGesture {
+                            isImageFullscreen = true
+                        }
+                    
+                    // 日期覆盖在图片上
+                    Text(formattedDate(note.date))
+                        .font(.caption)
+                        .padding(8)
+                        .background(Color.black.opacity(0.6))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                        .padding(12)
+                }
+                
+                // 位置信息部分
+                if let location = note.location {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("图片位置", systemImage: "mappin.and.ellipse")
+                            .font(.headline)
+                        
+                        if !note.locationName.isEmpty {
+                            Text(note.locationName)
+                                .font(.subheadline)
+                        }
+                        
+                        Text("经度: \(location.longitude, specifier: "%.6f")")
+                            .font(.caption)
+                        Text("纬度: \(location.latitude, specifier: "%.6f")")
+                            .font(.caption)
                     }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
+                }
                 
-                Text(note.content)
-                    .font(.body)
-                
-                Text(formattedDate(note.date))
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                // 内容部分
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("笔记内容")
+                        .font(.headline)
+                    
+                    Text(note.content)
+                        .font(.body)
+                        .lineSpacing(4)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
             }
-            .padding()
+            .padding(.horizontal)
         }
         .navigationTitle("笔记详情")
+        .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(isPresented: $isImageFullscreen) {
             FullscreenImageView(image: note.image, isPresented: $isImageFullscreen)
         }
@@ -105,8 +148,8 @@ struct NoteDetailView: View {
     
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
         formatter.dateFormat = "yyyy年M月d日EEEE"
+        formatter.locale = Locale(identifier: "zh_CN")
         return formatter.string(from: date)
     }
 }
