@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import Photos
 
 struct AddNoteView: View {
     @Binding var notes: [Note]
@@ -15,6 +16,9 @@ struct AddNoteView: View {
     @State private var showingImagePicker = false
     @State private var showingFullScreenImage = false
     @State private var location: CLLocationCoordinate2D?
+    @State private var locationName: String = ""
+    @State private var isCopying = false
+    @State private var showingLocationInput = false
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -41,7 +45,7 @@ struct AddNoteView: View {
                                 Image(systemName: "photo")
                                     .font(.largeTitle)
                                     .foregroundColor(.gray)
-                                Text("点击选择图片")
+                                Text("选择图片")
                                     .foregroundColor(.gray)
                             }
                         }
@@ -62,16 +66,46 @@ struct AddNoteView: View {
                 if image != nil {
                     Section(header: Text("图片位置")) {
                         if let location = location {
+                            if !locationName.isEmpty {
+                                Text(locationName)
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.5)
+                                    .contextMenu {
+                                        Button(action: {
+                                            UIPasteboard.general.string = locationName
+                                            isCopying = true
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                                isCopying = false
+                                            }
+                                        }) {
+                                            Label("复制地址", systemImage: "doc.on.doc")
+                                        }
+                                    }
+                                    .overlay(
+                                        Group {
+                                            if isCopying {
+                                                Text("已复制")
+                                                    .padding(6)
+                                                    .background(Color.black.opacity(0.7))
+                                                    .foregroundColor(.white)
+                                                    .cornerRadius(8)
+                                            }
+                                        }
+                                    )
+                            }
+                            
                             HStack {
-                                Text("纬度: \(location.latitude, specifier: "%.4f")")
+                                Text("经度: \(location.longitude, specifier: "%.6f")")
                                 Spacer()
-                                Text("经度: \(location.longitude, specifier: "%.4f")")
+                                Text("纬度: \(location.latitude, specifier: "%.6f")")
                             }
                             .font(.caption)
                             .foregroundColor(.gray)
                         }
                         Button(location == nil ? "添加图片位置" : "更改图片位置") {
-                            getImageLocation()
+                            showingLocationInput = true
                         }
                     }
                 }
@@ -93,12 +127,15 @@ struct AddNoteView: View {
             )
         }
         .sheet(isPresented: $showingImagePicker) {
-            CustomImagePicker(image: $image, location: $location)
+            CustomImagePicker(image: $image, location: $location, locationName: $locationName)
         }
         .fullScreenCover(isPresented: $showingFullScreenImage) {
             if let image = image {
                 FullScreenImageView(image: image, isPresented: $showingFullScreenImage)
             }
+        }
+        .sheet(isPresented: $showingLocationInput) {
+            LocationInputView(locationName: $locationName, location: $location)
         }
     }
     
@@ -157,10 +194,10 @@ struct FullScreenImageView: View {
     }
 }
 
-// CustomImagePicker 需要更新以支持返回位置信息
 struct CustomImagePicker: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     @Binding var location: CLLocationCoordinate2D?
+    @Binding var locationName: String
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -176,6 +213,7 @@ struct CustomImagePicker: UIViewControllerRepresentable {
     
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         let parent: CustomImagePicker
+        let geocoder = CLGeocoder()
         
         init(_ parent: CustomImagePicker) {
             self.parent = parent
@@ -184,18 +222,73 @@ struct CustomImagePicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
                 parent.image = image
-                // 这里应该尝试从图片中提取位置信息
-                if let location = extractLocationFromImage(image) {
-                    parent.location = location
+                
+                if let asset = info[.phAsset] as? PHAsset {
+                    extractLocationFromAsset(asset)
+                } else if let imageURL = info[.imageURL] as? URL {
+                    extractLocationFromImageURL(imageURL)
                 }
             }
             picker.dismiss(animated: true)
         }
         
-        func extractLocationFromImage(_ image: UIImage) -> CLLocationCoordinate2D? {
-            // 这里应该实现从图片EXIF数据中提取位置信息的逻辑
-            // 返回 CLLocationCoordinate2D 或 nil
-            return nil
+        func extractLocationFromAsset(_ asset: PHAsset) {
+            asset.location.map { location in
+                DispatchQueue.main.async {
+                    self.parent.location = location.coordinate
+                    self.reverseGeocode(location: location.coordinate)
+                }
+            }
+        }
+        
+        func extractLocationFromImageURL(_ url: URL) {
+            guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else { return }
+            
+            guard let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [String: Any] else { return }
+            
+            if let gpsInfo = imageProperties[kCGImagePropertyGPSDictionary as String] as? [String: Any],
+               let latitude = gpsInfo[kCGImagePropertyGPSLatitude as String] as? Double,
+               let longitude = gpsInfo[kCGImagePropertyGPSLongitude as String] as? Double {
+                
+                let latitudeRef = gpsInfo[kCGImagePropertyGPSLatitudeRef as String] as? String ?? "N"
+                let longitudeRef = gpsInfo[kCGImagePropertyGPSLongitudeRef as String] as? String ?? "E"
+                
+                let finalLatitude = latitudeRef == "N" ? latitude : -latitude
+                let finalLongitude = longitudeRef == "E" ? longitude : -longitude
+                
+                DispatchQueue.main.async {
+                    self.parent.location = CLLocationCoordinate2D(latitude: finalLatitude, longitude: finalLongitude)
+                    self.reverseGeocode(location: CLLocationCoordinate2D(latitude: finalLatitude, longitude: finalLongitude))
+                }
+            }
+        }
+        
+        func reverseGeocode(location: CLLocationCoordinate2D) {
+            let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+            geocoder.reverseGeocodeLocation(clLocation) { placemarks, error in
+                if let error = error {
+                    print("反向地理编码错误: \(error.localizedDescription)")
+                    return
+                }
+                
+                if let placemark = placemarks?.first {
+                    let addressComponents = [
+                        placemark.administrativeArea,  // 省
+                        placemark.locality,            // 市
+                        placemark.subLocality,         // 区
+                        placemark.thoroughfare,        // 街道
+                        placemark.subThoroughfare      // 门牌号
+                    ]
+                    
+                    let name = addressComponents
+                        .compactMap { $0 }
+                        .joined(separator: "")
+                    
+                    DispatchQueue.main.async {
+                        self.parent.locationName = name
+                    }
+                }
+            }
         }
     }
 }

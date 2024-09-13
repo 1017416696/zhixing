@@ -11,6 +11,7 @@
 		F66038552C928B40008F17B7 /* AddNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038542C928B40008F17B7 /* AddNoteView.swift */; };
 		F66038582C928B5B008F17B7 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038562C928B5B008F17B7 /* Note.swift */; };
 		F66038592C928B5B008F17B7 /* NotesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66038572C928B5B008F17B7 /* NotesListView.swift */; };
+		F6615E922C93CAA800D24F3A /* EditLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6615E912C93CAA800D24F3A /* EditLocation.swift */; };
 		F6BF73362C8D73F80011D5D5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BF73352C8D73F80011D5D5 /* AppDelegate.swift */; };
 		F6BF733E2C8DE9540011D5D5 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BF733D2C8DE9540011D5D5 /* CameraView.swift */; };
 		F6F9058C2C8C49E100815465 /* zhixingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F9058B2C8C49E100815465 /* zhixingApp.swift */; };
@@ -46,6 +47,7 @@
 		F66038542C928B40008F17B7 /* AddNoteView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddNoteView.swift; sourceTree = "<group>"; };
 		F66038562C928B5B008F17B7 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		F66038572C928B5B008F17B7 /* NotesListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesListView.swift; sourceTree = "<group>"; };
+		F6615E912C93CAA800D24F3A /* EditLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditLocation.swift; sourceTree = "<group>"; };
 		F6BF73352C8D73F80011D5D5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F6BF733D2C8DE9540011D5D5 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		F6F905882C8C49E100815465 /* zhixing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = zhixing.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -124,6 +126,7 @@
 				F6F905B72C8C4CB100815465 /* ImagePicker.swift */,
 				F6BF733D2C8DE9540011D5D5 /* CameraView.swift */,
 				F66038522C928931008F17B7 /* MapView.swift */,
+				F6615E912C93CAA800D24F3A /* EditLocation.swift */,
 			);
 			path = zhixing;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				F6F9058E2C8C49E100815465 /* ContentView.swift in Sources */,
 				F6F905B82C8C4CB100815465 /* ImagePicker.swift in Sources */,
 				F6F9058C2C8C49E100815465 /* zhixingApp.swift in Sources */,
+				F6615E922C93CAA800D24F3A /* EditLocation.swift in Sources */,
 				F6BF733E2C8DE9540011D5D5 /* CameraView.swift in Sources */,
 				F66038582C928B5B008F17B7 /* Note.swift in Sources */,
 				F6BF73362C8D73F80011D5D5 /* AppDelegate.swift in Sources */,
